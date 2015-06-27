@@ -47,7 +47,7 @@ public class PushHandlerActivity extends Activity
             
             originalExtras.putBoolean("foreground", false);
             originalExtras.putBoolean("coldstart", !isPushPluginActive);
-
+          notificationManager.cancelAll();
 		}
 	}
 
