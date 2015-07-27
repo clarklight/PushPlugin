@@ -195,35 +195,39 @@
 {
 	[self failWithMessage:@"" withError:error];
 }
-
+// The new change bit is here
 - (void)notificationReceived {
     NSLog(@"Notification received");
-
+    
     if (notificationMessage && self.callback)
     {
         NSMutableString *jsonStr = [NSMutableString stringWithString:@"{"];
-
+        
         [self parseDictionary:notificationMessage intoJSON:jsonStr];
-
+        
         if (isInline)
         {
             [jsonStr appendFormat:@"foreground:\"%d\"", 1];
             isInline = NO;
         }
-		else
+        else
             [jsonStr appendFormat:@"foreground:\"%d\"", 0];
-
+        
         [jsonStr appendString:@"}"];
-
+        
         NSLog(@"Msg: %@", jsonStr);
-
+        
         NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.callback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
-
+        
+        //get javascript function to fire in background mode
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:jsonStr];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:self.callbackId];
+        
         self.notificationMessage = nil;
     }
 }
-
+// Ends here
 // reentrant method to drill down and surface all sub-dictionaries' key/value pairs into the top level json
 -(void)parseDictionary:(NSDictionary *)inDictionary intoJSON:(NSMutableString *)jsonString
 {
